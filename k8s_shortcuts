@@ -1,0 +1,313 @@
+
+## Added by Sushobhan ##########################################################################################
+
+
+
+
+
+
+
+# Common K8S commands ------------------------------------------------------------------------------------------
+alias k='kubectl'
+complete -o default -F __start_kubectl k
+alias kl='kubectl logs'
+alias kdp='kubectl delete pod'
+alias kx='kubectl exec -it'
+alias ktn='kubectl top node'
+alias ktw='kubectl top node -l node-role.kubernetes.io/worker=true'
+alias wktn='watch kubectl top node'
+alias wktw='watch kubectl top node -l node-role.kubernetes.io/worker=true'
+alias pvcl='kubectl get pvc -A'
+alias pvl='kubectl get pv -A'
+alias hla='helm list -A'
+alias dkss='kss >> kss_output__$(date +%Y_%m_%d__%H_%M_%S)'
+alias kdep='kubectl describe pod'
+alias ksp='/opt/cdf/bin/kube-stop.sh -y'
+alias kss='/opt/cdf/bin/kube-status.sh'
+alias kst='/opt/cdf/bin/kube-start.sh'
+alias kja='kubectl get jobs -A'
+alias pdc="eval 'kubectl --namespace='{core,kube-system}' get pod;'"
+alias pcmA='kubectl get cm -A'
+alias p2cA="kubectl get pod -A | grep -vP '\s+([1-9]+[\d]*)\/\1\s+' | grep -vE '\s+Completed\s+'"
+alias p2cAw="kubectl get pod -A -o wide | grep -vP '\s+([1-9]+[\d]*)\/\1\s+' | grep -vE '\s+Completed\s+'"
+alias kgn='kubectl get no'
+alias kgnw='kubectl get no -o wide'
+alias kgw='kubectl get no -l node-role.kubernetes.io/worker=true'
+alias kgww='kubectl get no -o wide -l node-role.kubernetes.io/worker=true'
+alias pdA='kubectl get po -A'
+alias pdAw='kubectl get po -A -o wide'
+alias pdAws='kubectl get po -A -o wide --sort-by=.spec.nodeName'
+alias kcs="kubectl get --raw='/readyz?verbose'"
+alias wp2cA="watch 'kubectl get pod -A | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias wp2cAw="watch 'kubectl get pod -A -o wide | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias sc="kubectl scale deploy"
+alias kgd="kubectl get daemonsets -A"
+
+
+
+
+
+
+## for OMT
+export nsco=core
+alias kco='kubectl -n $nsco'
+alias klco='kubectl logs -n $nsco'
+alias klcot='kubectl logs -n $nsco --tail=200'
+alias klcop='kubectl logs -n $nsco --previous'
+alias kxco='kubectl exec -it -n $nsco'
+alias kdco='kubectl -n $nsco delete pod'
+alias dpco='kubectl get pods -n $nsco >> pods_output__$(date +%Y_%m_%d__%H_%M_%S)'
+alias stopcore='/opt/cdf/scripts/cdfctl.sh runlevel set -l DOWN -n $nsco'
+alias startcore='/opt/cdf/scripts/cdfctl.sh runlevel set -l UP -n $nsco'
+alias pdco='kubectl get pods -n $nsco'
+alias pdcow='kubectl get pods -n $nsco -o wide'
+alias pdcows='kubectl get pods -n $nsco -o wide --sort-by=.spec.nodeName'
+alias wpdco='watch kubectl get pods -n $nsco'
+alias wpdcow='watch kubectl get pods -n $nsco -o wide'
+alias kdepco="kubectl describe pod -n $nsco"
+alias pco='kubectl get pods -n $nsco | grep -vE "Completed|Evicted"'
+alias kdpco='kubectl get deployments -n $nsco'
+alias hvco='helm get values $nsco -n $nsco -o yaml > ~/`dt`core_helm_input_values.yaml'
+alias kjco="kubectl get jobs -n $nsco"
+alias kdpvco='kubectl delete -n $nsco pvc'
+alias p2core="kubectl get pods -n $nsco | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias p2core="kubectl get pods -n $nsco -o wide | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias k9co="k9s -n $nsco"
+alias kdecmcore='kubectl describe -n $nsco configmap'
+alias wp2core="watch 'kubectl get pod -n $nsco | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias wp2corew="watch 'kubectl get pod -n $nsco -o wide | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias scco="kubectl scale deploy -n $nsco"
+alias hhco="helm history $nsco -n $nsco"
+
+
+## for OpsB Suite
+export nso=opsb-helm
+alias ko='kubectl -n $nso'
+alias klo='kubectl logs -n $nso'
+alias klot='kubectl logs -n $nso --tail=200'
+alias klop='kubectl logs -n $nso --previous'
+alias kxo='kubectl exec -it -n $nso'
+alias kdo='kubectl -n $nso delete pod'
+alias dpo='kubectl get pods -n $nso >> pods_output__$(date +%Y_%m_%d__%H_%M_%S)'
+alias stopopsb='/opt/cdf/scripts/cdfctl.sh runlevel set -l DOWN -n $nso'
+alias startopsb='/opt/cdf/scripts/cdfctl.sh runlevel set -l UP -n $nso'
+alias pdo='kubectl get pods -n $nso'
+alias pdow='kubectl get pods -n $nso -o wide'
+alias pdows='kubectl get pods -n $nso -o wide --sort-by=.spec.nodeName'
+alias wpdo='watch kubectl get pods -n $nso'
+alias wpdow='watch kubectl get pods -n $nso -o wide'
+alias kdepo="kubectl describe pod -n $nso"
+alias por='kubectl get pods -n $nso | grep -vE "Completed|Evicted"'
+alias kdpo='kubectl get deployments -n $nso'
+alias hvo='helm get values $nso -n $nso -o yaml > ~/`dt`opsb_helm_input_values.yaml'
+alias kjo="kubectl get jobs -n $nso"
+alias kdpvco='kubectl delete -n $nso pvc'
+alias p2co="kubectl get pods -n $nso | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias p2cow="kubectl get pods -n $nso -o wide | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias klexomi="kc exec -it omi-0 -n $nso -c omi -- bash"
+alias k9o="k9s -n $nso"
+alias kdecmo='kubectl describe -n $nso configmap'
+alias wp2co="watch 'kubectl get pod -n $nso | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias wp2cow="watch 'kubectl get pod -n $nso -o wide | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias sco="kubectl scale deploy -n $nso"
+alias hho="helm history $nso -n $nso"
+
+## for DCA Suite
+export nsd=dca-helm
+alias kd='kubectl -n $nsd'
+alias kld='kubectl logs -n $nsd'
+alias kldt='kubectl logs -n $nsd --tail=200'
+alias kldp='kubectl logs -n $nsd --previous'
+alias kxd='kubectl exec -it -n $nsd'
+alias kdd='kubectl -n $nsd delete pod'
+alias dpd='kubectl get pods -n $nsd >> pods_output__$(date +%Y_%m_%d__%H_%M_%S)'
+alias stopdca='/opt/cdf/scripts/cdfctl.sh runlevel set -l DOWN -n $nsd'
+alias startdca='/opt/cdf/scripts/cdfctl.sh runlevel set -l UP -n $nsd'
+alias pdd='kubectl get pods -n $nsd'
+alias pddw='kubectl get pods -n $nsd -o wide'
+alias pddws='kubectl get pods -n $nsd -o wide --sort-by=.spec.nodeName'
+alias wpdd='watch kubectl get pods -n $nsd'
+alias wpddw='watch kubectl get pods -n $nsd -o wide'
+alias kdepd="kubectl describe pod -n $nsd"
+alias pdr='kubectl get pods -n $nsd | grep -vE "Completed|Evicted"'
+alias kdpd='kubectl get deployments -n $nsd'
+alias hvd='helm get values $nsd -n $nsd -o yaml > ~/`dt`dca_helm_input_values.yaml'
+alias kjd="kubectl get jobs -n $nsd"
+alias kdpvcd='kubectl delete -n $nsd pvc'
+alias p2cd="kubectl get pods -n $nsd | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias p2cdw="kubectl get pods -n $nsd -o wide | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias k9d="k9s -n $nsd"
+alias kdecmd='kubectl describe -n $nsd configmap'
+alias wp2cd="watch 'kubectl get pod -n $nsd | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias wp2cdw="watch 'kubectl get pod -n $nsd -o wide | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias scd="kubectl scale deploy -n $nsd"
+alias hhd="helm history $nsd -n $nsd"
+
+
+## for ITSMA Suite
+#export nsi=itsma-helm
+export nsi=$(kubectl get ns |grep itsma | cut -f1 -d " ")
+alias ki='kubectl -n $nsi'
+alias kli='kubectl logs -n $nsi'
+alias klit='kubectl logs -n $nsi --tail=200'
+alias klip='kubectl logs -n $nsi --previous'
+alias kxi='kubectl exec -it -n $nsi'
+alias kdi='kubectl -n $nsi delete pod'
+alias dpi='kubectl get pods -n $nsi >> pods_output__$(date +%Y_%m_%d__%H_%M_%S)'
+alias stopsma='/opt/cdf/scripts/cdfctl.sh runlevel set -l DOWN -n $nsi'
+alias startsma='/opt/cdf/scripts/cdfctl.sh runlevel set -l UP -n $nsi'
+alias pdi='kubectl get pods -n $nsi'
+alias pdiw='kubectl get pods -n $nsi -o wide'
+alias pdiws='kubectl get pods -n $nsi -o wide --sort-by=.spec.nodeName'
+alias wpdi='watch kubectl get pods -n $nsi'
+alias wpdiw='watch kubectl get pods -n $nsi -o wide'
+alias kdepi="kubectl describe pod -n $nsi"
+alias pir='kubectl get pods -n $nsi | grep -vE "Completed|Evicted"'
+alias kdpi='kubectl get deployments -n $nsi'
+alias hvi='helm get values $nsi -n $nsi -o yaml > ~/`dt`itsma_helm_input_values.yaml'
+alias kji="kubectl get jobs -n $nsi"
+alias kdpvci='kubectl delete -n $nsi pvc'
+alias p2ci="kubectl get pods -n $nsi | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias p2ciw="kubectl get pods -n $nsi -o wide | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias k9i="k9s -n $nsi"
+alias kdecmi='kubectl describe -n $nsi configmap'
+alias wp2ci="watch 'kubectl get pod -n $nsi | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias wp2ciw="watch 'kubectl get pod -n $nsi -o wide | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias tk-exec="kubectl exec -it $( kubectl get pods -n $nsi |grep itom-toolkit | awk '{print $1}' | head -1) -n $nsi -c itom-toolkit -- bash"
+alias sci="kubectl scale deploy -n $nsi"
+alias hhi="helm history $nsi -n $nsi"
+
+## for OO Suite
+export nsoo=oo-helm
+alias koo='kubectl -n $nsoo'
+alias kloo='kubectl logs -n $nsoo'
+alias kloot='kubectl logs -n $nsoo --tail=200'
+alias kloop='kubectl logs -n $nsoo --previous'
+alias kxoo='kubectl exec -it -n $nsoo'
+alias kdoo='kubectl -n $nsoo delete pod'
+alias dpoo='kubectl get pods -n $nsoo >> pods_output__$(date +%Y_%m_%d__%H_%M_%S)'
+alias stopoo='/opt/cdf/scripts/cdfctl.sh runlevel set -l DOWN -n $nsoo'
+alias startoo='/opt/cdf/scripts/cdfctl.sh runlevel set -l UP -n $nsoo'
+alias pdoo='kubectl get pods -n $nsoo'
+alias pdoow='kubectl get pods -n $nsoo -o wide'
+alias pdoows='kubectl get pods -n $nsoo -o wide --sort-by=.spec.nodeName'
+alias wpdoo='watch kubectl get pods -n $nsoo'
+alias wpdoow='watch kubectl get pods -n $nsoo -o wide'
+alias kdepoo="kubectl describe pod -n $nsoo"
+alias poor='kubectl get pods -n $nsoo | grep -vE "Completed|Evicted"'
+alias kdpoo='kubectl get deployments -n $nsoo'
+alias hvoo='helm get values $nsoo -n $nsoo -o yaml > ~/`dt`oo_helm_input_values.yaml'
+alias kjoo="kubectl get jobs -n $nsoo"
+alias kdpvcoo='kubectl delete -n $nsoo pvc'
+alias p2coo="kubectl get pods -n $nsoo | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias p2coow="kubectl get pods -n $nsoo -o wide | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias k9oo="k9s -n $nsoo"
+alias kdecmoo='kubectl describe -n $nsoo configmap'
+alias wp2coo="watch 'kubectl get pod -n $nsoo | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias wp2coow="watch 'kubectl get pod -n $nsoo -o wide | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias scoo="kubectl scale deploy -n $nsoo"
+alias hhoo="helm history $nsoo -n $nsoo"
+
+
+## for CMS Suite
+export nsc=cms-helm
+alias kc='kubectl -n $nsc'
+alias klc='kubectl logs -n $nsc'
+alias klt='kubectl logs -n $nsc --tail=200'
+alias klip='kubectl logs -n $nsc --previous'
+alias kxc='kubectl exec -it -n $nsc'
+alias kdc='kubectl -n $nsc delete pod'
+alias dpc='kubectl get pods -n $nsc >> pods_output__$(date +%Y_%m_%d__%H_%M_%S)'
+alias stopcms='/opt/cdf/scripts/cdfctl.sh runlevel set -l DOWN -n $nsc'
+alias startcms='/opt/cdf/scripts/cdfctl.sh runlevel set -l UP -n $nsc'
+alias pdc='kubectl get pods -n $nsc'
+alias pdcw='kubectl get pods -n $nsc -o wide'
+alias pdcws='kubectl get pods -n $nsc -o wide --sort-by=.spec.nodeName'
+alias wpdc='watch kubectl get pods -n $nsc'
+alias wpdcw='watch kubectl get pods -n $nsc -o wide'
+alias kdepc="kubectl describe pod -n $nsc"
+alias pcr='kubectl get pods -n $nsc | grep -vE "Completed|Evicted"'
+alias kdpc='kubectl get deployments -n $nsc'
+alias hvc='helm get values $nsc -n $nsc -o yaml > ~/`dt`cms_helm_input_values.yaml'
+alias kjc="kubectl get jobs -n $nsc"
+alias kdpvcc='kubectl delete -n $nsc pvc'
+alias p2cc="kubectl get pods -n $nsc | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias p2ccw="kubectl get pods -n $nsc -o wide | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias k9c="k9s -n $nsc"
+alias kdecmc='kubectl describe -n $nsc configmap'
+alias wp2cc="watch 'kubectl get pod -n $nsc | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias wp2ccw="watch 'kubectl get pod -n $nsc -o wide | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias scc="kubectl scale deploy -n $nsc"
+alias hhc="helm history $nsc -n $nsc"
+
+
+## for AUDIT Helm Chart
+export nsa=auditns
+alias ka='kubectl -n $nsa'
+alias kla='kubectl logs -n $nsa'
+alias klat='kubectl logs -n $nsa --tail=200'
+alias klap='kubectl logs -n $nsa --previous'
+alias kxa='kubectl exec -it -n $nsa'
+alias kda='kubectl -n $nsa delete pod'
+alias dpa='kubectl get pods -n $nsa >> pods_output__$(date +%Y_%m_%d__%H_%M_%S)'
+alias stopaudit='/opt/cdf/scripts/cdfctl.sh runlevel set -l DOWN -n $nsa'
+alias startaudit='/opt/cdf/scripts/cdfctl.sh runlevel set -l UP -n $nsa'
+alias pda='kubectl get pods -n $nsa'
+alias pdaw='kubectl get pods -n $nsa -o wide'
+alias pdaws='kubectl get pods -n $nsa -o wide --sort-by=.spec.nodeName'
+alias wpda='watch kubectl get pods -n $nsa'
+alias wpdaw='watch kubectl get pods -n $nsa -o wide'
+alias kdepa="kubectl describe pod -n $nsa"
+alias par='kubectl get pods -n $nsa | grep -vE "Completed|Evicted"'
+alias kdpa='kubectl get deployments -n $nsa'
+alias hva='helm get values $nsa -n $nsa -o yaml > ~/`dt`audit_helm_input_values.yaml'
+alias kja="kubectl get jobs -n $nsa"
+alias kdpvca='kubectl delete -n $nsa pvc'
+alias p2ca="kubectl get pods -n $nsa | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias p2caw="kubectl get pods -n $nsa -o wide | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias k9a="k9s -n $nsa"
+alias kdecma='kubectl describe -n $nsa configmap'
+alias wp2ca="watch 'kubectl get pod -n $nsa | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias wp2caw="watch 'kubectl get pod -n $nsa -o wide | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias sca="kubectl scale deploy -n $nsa"
+alias hha="helm history $nsa -n $nsa"
+
+
+## for Operations Platform Helm Chart
+export nsop=op-reports-helm
+alias kop='kubectl -n $nsop'
+alias klop='kubectl logs -n $nsop'
+alias klopt='kubectl logs -n $nsop --tail=200'
+alias klopp='kubectl logs -n $nsop --previous'
+alias kxop='kubectl exec -it -n $nsop'
+alias kdop='kubectl -n $nsop delete pod'
+alias dpop='kubectl get pods -n $nsop >> pods_output__$(date +%Y_%m_%d__%H_%M_%S)'
+alias stopop='/opt/cdf/scripts/cdfctl.sh runlevel set -l DOWN -n $nsop'
+alias startop='/opt/cdf/scripts/cdfctl.sh runlevel set -l UP -n $nsop'
+alias pdop='kubectl get pods -n $nsop'
+alias pdopw='kubectl get pods -n $nsop -o wide'
+alias pdopws='kubectl get pods -n $nsop -o wide --sort-by=.spec.nodeName'
+alias wpdop='watch kubectl get pods -n $nsop'
+alias wpdopw='watch kubectl get pods -n $nsop -o wide'
+alias kdepop="kubectl describe pod -n $nsop"
+alias popr='kubectl get pods -n $nsop | grep -vE "Completed|Evicted"'
+alias kdpop='kubectl get deployments -n $nsop'
+alias hvop='helm get values $nsop -n $nsop -o yaml > ~/`dt`op-reports-helm_input_values.yaml'
+alias kjop="kubectl get jobs -n $nsop"
+alias kdpvcop='kubectl delete -n $nsop pvc'
+alias p2cop="kubectl get pods -n $nsop | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias p2copw="kubectl get pods -n $nsop -o wide | awk -F \" *|/\" '(\$2!=\$3 || \$4!=\"Running\") && \$4!=\"Completed\" {print \$0}'"
+alias k9op="k9s -n $nsop"
+alias kdecmop='kubectl describe -n $nsop configmap'
+alias wp2cop="watch 'kubectl get pod -n $nsop | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias wp2copw="watch 'kubectl get pod -n $nsop -o wide | grep -v 1/1 | grep -v 2/2 | grep -v 3/3 | grep -v 4/4 | grep -v Completed'"
+alias scop="kubectl scale deploy -n $nsop"
+alias hhop="helm history $nsop -n $nsop"
+
+
+
+
+
+
+
+#------------------------------------------------------------------------------------------------------------------------------
