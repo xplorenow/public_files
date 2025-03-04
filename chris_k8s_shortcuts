@@ -1,0 +1,204 @@
+#newalias
+alias k8='kubectl'
+alias k8getpods='echo =============pods=============;k8 get pods --all-namespaces'
+alias get=' kubectl get pods --all-namespaces -o wide|grep $1'
+alias version='kubectl get cm -n $ns itsma-common-configmap -o yaml |grep -v f: |grep itom_suite_version:'
+
+checkHelm(){
+  helm_release_name=`helm list -n ${namespace} |grep -v NAME|grep esm-|awk '{print $1}'|tail -1`
+  if [[ ! -z $helm_release_name ]]; then
+    is_helm=true
+  else
+    is_helm=false
+  fi
+}
+
+getNamespace(){
+    if [[ -z $namespace ]]; then
+        namespace=`kubectl get namespaces | grep itsma | awk '{print $1}'`
+        if [[ -z $namespace ]]; then
+            echo "Input Suite namespace:"
+            read namespace
+        fi
+        ns_exist=`kubectl get ns |grep "$namespace " |wc -l`
+        if [[ $ns_exist == 0 ]]; then
+          echo "Error: namespace($namespace) does not exist, please provide a correct one, exit ..."
+          return
+        fi
+    fi
+    checkHelm
+    NAMESPACE=$namespace
+    ns=$namespace
+    namespace=$namespace
+}
+
+
+function wp {
+while [ 1 -eq 1 ]; do
+  clear &&  kubectl get pods --all-namespaces -o wide | awk -F " *|/" '($3!=$4 || $5!="Running") && $5!="Completed" {print $0}' && sleep 10
+done
+}
+function des {
+podname=$1 && name_space=`kubectl get pods --all-namespaces | grep ${podname} | cut -f1 -d " "`
+if [ -z ${name_space} ]; then
+name_space=core
+fi
+echo  kubectl describe pod ${podname} -n ${name_space} &&  kubectl describe pod ${podname} -n ${name_space}
+}
+function delete() {
+  podnamelist=$1
+  for podname in `echo $podnamelist`
+  do
+    name_space=`kubectl get pods --all-namespaces | grep ${podname} | cut -f1 -d " "`
+    kubectl delete pod ${podname} -n ${name_space} --force --grace-period=0
+  done
+}
+
+function scale(){
+  number=$1
+  key=$2
+  for deployment_name in `kubectl get deployment -A |grep $key | awk '{print $2}'`
+  do
+    for name_space in `kubectl get deployment --all-namespaces | grep " ${deployment_name} " | awk '{print $1}'`
+    do
+      kubectl scale deployment $deployment_name -n $name_space --replicas=$number
+      deletes Termin
+    done
+  done
+}
+
+function edit(){
+  key=$1
+  for deployment_name in `kubectl get deployment -A |grep $key | awk '{print $2}'`
+  do
+    name_space=`kubectl get deployment --all-namespaces | grep " ${deployment_name} " | awk '{print $1}'|head -n 1`
+    kubectl edit deployment $deployment_name -n $name_space
+  done
+}
+function deletes() {
+  key=$1
+  for podname in `kubectl get pods -A |grep $key | awk '{print $2}'`
+  do
+    name_space=`kubectl get pods --all-namespaces | grep ${podname} | cut -f1 -d " "`
+    delete $podname
+  done
+}
+function rst(){
+  key=$1
+  for podname in `kubectl get pods -A |grep $key | awk '{print $2}'`
+  do
+    name_space=`kubectl get pods --all-namespaces | grep ${podname} | cut -f1 -d " "`
+    echo "delete pod $podname"
+    delete $podname
+  done
+  sleep 2
+  for podname in `kubectl get pods -A |grep $key | awk '{print $2}'`
+  do
+    name_space=`kubectl get pods --all-namespaces | grep ${podname} | cut -f1 -d " " | head -1`
+    echo "check log for $podname"
+    sleep 1
+    log $podname
+  done
+}
+function log {
+podname=$1 && name_space=`kubectl get pods --all-namespaces | grep ${podname} | cut -f1 -d " "`
+if [ -z ${name_space} ]; then
+  name_space=core
+fi
+container_id=` kubectl describe pod ${podname} -n ${name_space} | sed -n '/Container\ ID/{x;p};h' | sed 's/://g' | sed 's/\ \ //g'`
+if [  -z ${container_id} ]; then
+  echo kubectl logs -f -n ${name_space} ${podname} && sleep 1 &&  kubectl logs -f -n ${name_space} ${podname}
+else
+  local j=0
+  for i in `echo $container_id`
+  do
+    if [ ! -z $i ]; then
+      j=$((j+1))
+    fi
+  done
+  while [[ true ]];
+  do
+  if [[ $j == 1 ]]; then
+    echo kubectl logs -f  -n ${name_space} $1 -c ${container_id} && sleep 1 &&  kubectl logs -f --tail=100 -n ${name_space} ${podname} -c ${container_id}
+  else
+    arr=(${container_id})
+    local k=1
+    local defaultid
+    for i in `echo $container_id`
+    do
+      echo $k ... $i
+      if [[ $i != *"vault"* &&  $i != *"install"* &&  $i != *"dependence"*  &&  $i != *"throttling"* &&  $i != *"permission"* &&  $i != *"dependency"* ]]; then
+        defaultid=$((k-1))
+      fi
+      k=$((k+1))
+    done
+    if [ -z $defaultid ]; then
+      defaultid = 0
+    fi
+    read -p "Enter number for container default [${arr[$defaultid]}]":  cid
+    if [[ -z $cid ]]; then
+      cid=$defaultid
+    elif [[ $cid -gt $((k-1)) || $cid -lt 1 ]]; then
+      echo Not a valid input, please input 1~$((k-1))
+      continue
+    else
+      cid=$((cid-1))
+      defaultid=$cid
+    fi
+    echo kubectl logs --tail=100 -f -n ${name_space} ${podname} -c ${arr[$cid]}  && sleep 1 &&  kubectl logs -f -n ${name_space} ${podname} -c ${arr[$cid]}
+  fi
+  done
+fi
+}
+
+function execit {
+podname=`get |awk '{print $2}'` && name_space=` kubectl get pods --all-namespaces | grep ${podname} | cut -f1 -d " "`
+if [ -z ${name_space} ]; then
+  name_space=core
+fi
+container_id=`kubectl describe pod ${podname} -n ${name_space} | sed -n '/Container\ ID/{x;p};h' | grep -v vault| grep -v install |grep -v dependence |grep -v waitfor | grep -v vault | grep -v throttling | grep -v permission | grep -v dependency| sed 's/://g' | sed 's/\ \ //g'`
+if [  -z ${container_id} ]; then
+  echo kubectl exec -it -n ${name_space} ${podname} -- sh && sleep 1 &&  kubectl exec -it -n ${name_space} ${podname} -- sh
+else
+  local j=0
+  for i in `echo $container_id`
+  do
+    if [ ! -z $i ]; then
+      j=$((j+1))
+    fi
+  done
+  if [[ $j == 1 ]]; then
+    echo kubectl exec -it -n ${name_space} $1 -c ${container_id}  -- sh && sleep 1 &&  kubectl exec -it -n ${name_space} ${podname} -c ${container_id}  -- sh
+  else
+    while [[ true ]];
+    do
+      arr=(${container_id})
+      local k=1
+      for i in `echo $container_id`
+      do
+        echo $k ... $i
+        k=$((k+1))
+      done
+      read -p "Enter number for container: " cid
+      if [[ $cid -gt $((k-1)) || $cid -lt 1 ]]; then
+        echo Not a valid input, please input 1~$((k-1))
+        continue
+      else
+        cid=$((cid-1))
+        break
+      fi
+    done
+    echo kubectl exec -it -n ${name_space} ${podname} -c ${arr[$cid]}  -- sh && sleep 1 &&  kubectl exec -it -n ${name_space} ${podname} -c ${arr[$cid]}  -- sh
+  fi
+fi
+}
+
+function fqdn(){
+  if [[ $is_helm == true ]]; then
+    fqdn=`helm get values -n $namespace $helm_release_name | yq .global.externalAccessHost`
+  else
+    fqdn=`kubectl get cm -n $namespace itsma-common-configmap -o json   | jq -r '.data.suite_logout_url'`
+  fi
+}
+
+getNamespace
