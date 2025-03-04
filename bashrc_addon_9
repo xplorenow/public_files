@@ -1,0 +1,60 @@
+## Added by Sushobhan ---------------------------------------------------------------------------------------------
+alias du='du -x'
+alias rf='rm -rf'
+alias rb='. ~/.bash_profile'
+alias rbc='clsf;. ~/.bash_profile'
+alias ver='cat /etc/system-release'
+alias kerneldcl='dnf remove $(dnf repoquery --installonly --latest-limit=-1 -q) -y'
+alias cleanallonly='dnf clean all -y; rm -rf /tmp/*; cat /dev/null > ~/.bash_history && history -c'
+alias cleanallreboot='dnf clean all -y; rm -rf /tmp/*; cat /dev/null > ~/.bash_history && history -c;reboot'
+alias cleanallshutdown='dnf clean all -y; rm -rf /tmp/*; cat /dev/null > ~/.bash_history && history -c;poweroff'
+alias hi='history'
+alias hic='cat /dev/null > ~/.bash_history && history -c'
+alias l.='ls -lFAh --time-style=long-iso'
+alias ll='ls -lFh --time-style=long-iso'
+alias lld='ls -lFAh -d * --time-style=long-iso'
+alias cls=clear
+alias clsf='clear;printf "\e[3J\033c"'
+alias dfl='df -hlT -x tmpfs -x squashfs -x vfat -x devtmpfs -x efivarfs -x overlay'
+alias df='df -hT -x tmpfs -x squashfs -x vfat -x devtmpfs -x efivarfs -x overlay'
+alias ifa='ifconfig -a'
+alias fd='fdisk -l'
+alias sfd='sfdisk -l -uM'
+alias mem='cat /proc/meminfo | grep MemTotal'
+alias dud='du -hx -d1 '
+alias cpu='lscpu | grep ^CPU\(s\)\:'
+alias mo='more'
+alias ld='ls -d */'
+alias ds='du -hcsx *'
+alias rsyncp='rsync -avh --progress'
+alias free='free -h'
+alias openports='lsof -i -P -n | grep LISTEN'
+alias env='env | sort'
+alias sctl=systemctl
+alias dt='date "+%Y_%m_%d__%H_%M_%S__%Z__"'
+alias tree='tree -hF'
+alias hic='history -c && history -w'
+alias chme="chmod 755 -R ./*; chown -R $USER:$USER ./*"
+# Bash history setting-------------------------------------------------------------
+export HISTSIZE=100000
+export HISTFILESIZE=100000
+export HISTTIMEFORMAT="%F %T "
+HISTCONTROL=ignoreboth:erasedups
+#shopt -s histappend
+#export PROMPT_COMMAND="history -a; history -r"
+export HISTIGNORE='rf:rb:rbc:ver:hi:ha:ll:cls:clsf:mo:ld:ds:free:env'
+export SYSTEMD_EDITOR=vim
+# ---------------------------------------------------------------------------------
+alias lserv1='systemctl list-unit-files --type service --state=enabled'
+alias lserv2='systemctl list-unit-files --all --state=enabled'
+alias ent='cat /proc/sys/kernel/random/entropy_avail'
+alias freec='echo 1 > /proc/sys/vm/drop_caches'
+alias tf='tail -f'
+alias ha='history -a; history -r'
+alias ssha='eval $(ssh-agent) && ssh-add'
+alias cps='cp --sparse=always'
+alias uz='unzip -qq'
+alias tzxf='tar zxf'
+alias txf='tar xf'
+alias clog='>/var/log/btmp;>/var/log/wtmp'
+## -----------------------------------------------------------------------------------------------------------------------
